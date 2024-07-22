@@ -4,23 +4,28 @@ using Para.Base.Response;
 using Para.Bussiness.CQRS.Queries.CustomerDetailQueries;
 using Para.Data.UnitOfWork;
 using Para.Schema;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Para.Bussiness.CQRS.Handlers.CustomerDetailHandlers
 {
-    public class GetCustomerDetailByIdQueryHandler : IRequestHandler<GetCustomerDetailByIdQuery, ApiResponse<CustomerDetailResponse>>
+    public class GetCustomerDetailByCustomerIdQueryHandler : IRequestHandler<GetCustomerDetailByCustomerIdQuery, ApiResponse<CustomerDetailResponse>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public GetCustomerDetailByIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public GetCustomerDetailByCustomerIdQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<ApiResponse<CustomerDetailResponse>> Handle(GetCustomerDetailByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<CustomerDetailResponse>> Handle(GetCustomerDetailByCustomerIdQuery request, CancellationToken cancellationToken)
         {
             var customerDetail = await _unitOfWork.CustomerDetailRepository.GetWithWhereAndInclude(
-                c => c.Id == request.customerDetailId,
+                c => c.CustomerId == request.customerId,
                 c => c.Customer);
 
 

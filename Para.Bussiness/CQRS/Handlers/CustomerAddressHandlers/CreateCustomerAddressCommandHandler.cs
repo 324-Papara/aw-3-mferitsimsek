@@ -22,7 +22,7 @@ namespace Para.Bussiness.CQRS.Handlers.CustomerAddressHandlers
         {
             // Eğer her kullanıcının tek adresi olacaksa aşağıdaki kod devreye alınabilir. İş kuralı gereği birden fazla adresi olabilir.
             #region Tek adress kontrolü
-            //var customer = await _unitOfWork.CustomerRepository.GetWithInclude(c=> c.Id==request.Request.CustomerId,
+            //var customer = await _unitOfWork.CustomerRepository.GetWithWhereAndInclude(c=> c.Id==request.Request.CustomerId,
             //                                                                   c => c.CustomerAddresses);
             //if (customer == null)
             //{

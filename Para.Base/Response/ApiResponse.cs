@@ -24,6 +24,7 @@ public partial class ApiResponse
 public partial class ApiResponse<T>
 {
     public T Data { get; set; }
+    public List<T> Datas { get; set; }
     public string Message { get; set; }
     public bool IsSuccess { get; set; }
     public DateTime ServerDate { get; set; } = DateTime.UtcNow;
@@ -36,7 +37,14 @@ public partial class ApiResponse<T>
         Data = data;
         Message = "Success";
     }
-    
+
+    public ApiResponse(List<T> data)
+    {
+        IsSuccess = true;
+        Datas = data;
+        Message = "Success";
+    }
+
     public ApiResponse(bool isSuccess)
     {
         IsSuccess = isSuccess;

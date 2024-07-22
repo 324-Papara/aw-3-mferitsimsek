@@ -1,13 +1,15 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Para.Api.Middleware;
 using Para.Api.Service;
 using Para.Bussiness;
-using Para.Bussiness.Cqrs;
+using Para.Bussiness.CQRS.Commands.CustomerCommands;
 using Para.Data.Context;
 using Para.Data.UnitOfWork;
 
@@ -51,11 +53,20 @@ public class Startup
         services.AddSingleton(config.CreateMapper());
 
 
+        //services.AddMediatR(typeof(CreateCustomerCommand).GetTypeInfo().Assembly);
+
         services.AddMediatR(typeof(CreateCustomerCommand).GetTypeInfo().Assembly);
+
 
         services.AddTransient<CustomService1>();
         services.AddScoped<CustomService2>();
         services.AddSingleton<CustomService3>();
+
+        // Otomatik doðrulama yapmak için AutoValidation kullanýyoruz.
+        services.AddFluentValidationAutoValidation()
+                    .AddFluentValidationClientsideAdapters(); // doðrulama kurallarý sadece sunucu tarafýnda deðil istemci tarafýndada uygulanýr. Örn: JavaScript ile 
+
+        services.AddValidatorsFromAssemblyContaining<Startup>(); //Startup bulunduðu Assembly içindeki Validatörleri otomatik bulup DI ' a ekler..
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

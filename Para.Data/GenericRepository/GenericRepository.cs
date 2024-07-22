@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Para.Base.Entity;
+using Para.Data.Helpers;
 using Para.Data.Context;
 using System.Linq.Expressions;
 
@@ -71,8 +72,8 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         }
         return await query.FirstOrDefaultAsync();
     }
-    // parametreli include methodu
-    public async Task<TEntity> GetAllWithWhereAndInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+    // parametreli include methodu tek varlýk getirir.
+    public async Task<TEntity> GetWithWhereAndInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
     {
         IQueryable<TEntity> query = dbContext.Set<TEntity>();
         foreach (var includeProperty in includeProperties)
@@ -80,6 +81,16 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
             query = query.Include(includeProperty);
         }
         return await query.Where(predicate).FirstOrDefaultAsync();
+    }
+    // parametreli include methodu iliþkili tüm varlýklarý getirir.
+    public async Task<List<TEntity>> GetAllWithWhereAndInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties)
+    {
+        IQueryable<TEntity> query = dbContext.Set<TEntity>();
+        foreach (var includeProperty in includeProperties)
+        {
+            query = query.Include(includeProperty);
+        }
+        return await query.Where(predicate).ToListAsync();
     }
     // dinamik sorgu methodu.
     public async Task<List<TEntity>> GetWithDynamicQuery(string propertyName, string comparison, string value, params Expression<Func<TEntity, object>>[] includeProperties)
@@ -98,4 +109,6 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
 
         return await query.ToListAsync();
     }
+
+
 }

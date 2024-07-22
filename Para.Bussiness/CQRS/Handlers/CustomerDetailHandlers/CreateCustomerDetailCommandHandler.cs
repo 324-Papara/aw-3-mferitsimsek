@@ -21,14 +21,14 @@ namespace Para.Bussiness.CQRS.Handlers.CustomerDetailHandlers
 
         public async Task<ApiResponse<CustomerDetailResponse>> Handle(CreateCustomerDetailCommand request, CancellationToken cancellationToken)
         {
-            var customer = await _unitOfWork.CustomerRepository.GetWithInclude(c=>c.Id==request.Request.CustomerId,
+            var customer = await _unitOfWork.CustomerRepository.GetWithWhereAndInclude(c=>c.Id==request.Request.CustomerId,
                                                                                c=> c.CustomerDetail);
             if (customer==null)
             {
                 return new ApiResponse<CustomerDetailResponse>("Customer not found.");
             }
 
-            if (customer.CustomerDetail==null)
+            if (customer.CustomerDetail!=null)
             {
                 return new ApiResponse<CustomerDetailResponse>("Customer already has a detail.");
             }

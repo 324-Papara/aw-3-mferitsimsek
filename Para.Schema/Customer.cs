@@ -3,7 +3,7 @@ using Para.Base.Schema;
 
 namespace Para.Schema;
 
-public class CustomerRequest  : BaseRequest
+public class CustomerRequest : BaseRequest
 {
     [JsonIgnore]
     public int CustomerNumber { get; set; }
@@ -12,6 +12,18 @@ public class CustomerRequest  : BaseRequest
     public string IdentityNumber { get; set; }
     public string Email { get; set; }
     public DateTime DateOfBirth { get; set; }
+}
+
+public class CustomerUpdateRequest : BaseRequest
+{
+    [JsonIgnore]
+    public int CustomerNumber { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string IdentityNumber { get; set; }
+    public string Email { get; set; }
+    public DateTime DateOfBirth { get; set; }
+    public bool IsActive { get; set; }
 }
 
 public class CustomerResponse : BaseResponse

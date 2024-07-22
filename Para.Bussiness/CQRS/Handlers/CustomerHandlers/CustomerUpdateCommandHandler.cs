@@ -20,8 +20,15 @@ namespace Para.Bussiness.CQRS.Handlers.CustomerHandlers
         }
         public async Task<ApiResponse> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
         {
-            var mapped = _mapper.Map<CustomerRequest, Customer>(request.Request);
-            mapped.Id = request.CustomerId;
+            // InsertUser InsertDate ve IsActive i değiştirmemek için eklendi. Bir diğer yöntem olarak MapperConfige örnekteki gibi eklenebilirler.
+            // .ForMember(dest => dest.CustomerNumber, opt => opt.Ignore());
+
+            var existingCustomer = await _unitOfWork.CustomerRepository.GetById(request.CustomerId);
+            if (existingCustomer == null)
+            {
+                return new ApiResponse("Customer not found.");
+            }
+            var mapped = _mapper.Map(request.Request, existingCustomer);
             _unitOfWork.CustomerRepository.Update(mapped);
             await _unitOfWork.Complete();
             return new ApiResponse();

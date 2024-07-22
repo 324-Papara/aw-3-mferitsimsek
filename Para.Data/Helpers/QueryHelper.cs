@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Para.Bussiness.Helpers
+namespace Para.Data.Helpers
 {
     public static class QueryHelper
     {

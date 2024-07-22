@@ -21,8 +21,10 @@ public interface IGenericRepository<TEntity> where TEntity : class
     // Ýliþkili tablolarý dahil ederek tüm varlýklarý getirir.
     Task<TEntity> GetWithInclude(params Expression<Func<TEntity, object>>[] includeProperties);
 
-    // Belirli bir koþula göre filtreleyerek ve iliþkili tablolarý dahil ederek varlýklarý getirir.
+    // Belirli bir koþula göre filtreleyerek ve iliþkili tablolarý dahil ederek varlýk getirir.
     Task<TEntity> GetWithWhereAndInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties);
+    // Belirli bir koþula göre filtreleyerek ve iliþkili tablolarý dahil ederek varlýklarý getirir.
+    Task<List<TEntity>> GetAllWithWhereAndInclude(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeProperties);
 
     // dbContext.Customers.Where(x=> x.Name == "Ali") gibi sorguyu dinamik almak için
     // propertyName = sorgulanacak özelliðin adý "Name"

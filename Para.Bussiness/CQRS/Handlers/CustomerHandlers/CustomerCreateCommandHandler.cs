@@ -20,6 +20,7 @@ namespace Para.Bussiness.CQRS.Handlers.CustomerHandlers
         }
         public async Task<ApiResponse<CustomerResponse>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
+
             var mapped = _mapper.Map<CustomerRequest, Customer>(request.Request);
             mapped.CustomerNumber = new Random().Next(1000000, 9999999);
             await _unitOfWork.CustomerRepository.Insert(mapped);

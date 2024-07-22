@@ -4,6 +4,7 @@ namespace Para.Schema;
 
 public class CustomerPhoneRequest : BaseRequest
 {
+    public long CustomerId { get; set; }
     public string CountyCode { get; set; } 
     public string Phone { get; set; }
     public bool IsDefault { get; set; }    
@@ -16,4 +17,5 @@ public class CustomerPhoneResponse : BaseResponse
     public string CountyCode { get; set; }
     public string Phone { get; set; }
     public bool IsDefault { get; set; }    
+    public virtual CustomerResponse Customer { get; set; }
 }

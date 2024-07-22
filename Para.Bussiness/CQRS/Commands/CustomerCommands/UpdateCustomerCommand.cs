@@ -4,7 +4,7 @@ using Para.Schema;
 
 namespace Para.Bussiness.CQRS.Commands.CustomerCommands
 {
-    public record UpdateCustomerCommand(long CustomerId, CustomerRequest Request) : IRequest<ApiResponse>
+    public record UpdateCustomerCommand(long CustomerId, CustomerUpdateRequest Request) : IRequest<ApiResponse>
     {
     }
 }

@@ -20,4 +20,5 @@ public class CustomerDetailResponse : BaseResponse
     public string EducationStatus { get; set; }
     public string MontlyIncome { get; set; }
     public string Occupation { get; set; }
+    public virtual CustomerResponse Customer { get; set; }
 }

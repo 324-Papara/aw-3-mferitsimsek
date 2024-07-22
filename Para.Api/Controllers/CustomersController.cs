@@ -1,8 +1,8 @@
-using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Para.Base.Response;
-using Para.Bussiness.Cqrs;
+using Para.Bussiness.CQRS.Commands.CustomerCommands;
+using Para.Bussiness.CQRS.Queries.CustomerQueries;
 using Para.Schema;
 
 namespace Para.Api.Controllers
@@ -12,7 +12,7 @@ namespace Para.Api.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly IMediator mediator;
-        
+
         public CustomersController(IMediator mediator)
         {
             this.mediator = mediator;
@@ -28,7 +28,7 @@ namespace Para.Api.Controllers
         }
 
         [HttpGet("{customerId}")]
-        public async Task<ApiResponse<CustomerResponse>> Get([FromRoute]long customerId)
+        public async Task<ApiResponse<CustomerResponse>> Get([FromRoute] long customerId)
         {
             var operation = new GetCustomerByIdQuery(customerId);
             var result = await mediator.Send(operation);
@@ -44,9 +44,9 @@ namespace Para.Api.Controllers
         }
 
         [HttpPut("{customerId}")]
-        public async Task<ApiResponse> Put(long customerId, [FromBody] CustomerRequest value)
+        public async Task<ApiResponse> Put(long customerId, [FromBody] CustomerUpdateRequest value)
         {
-            var operation = new UpdateCustomerCommand(customerId,value);
+            var operation = new UpdateCustomerCommand(customerId, value);
             var result = await mediator.Send(operation);
             return result;
         }

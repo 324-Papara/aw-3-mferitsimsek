@@ -20,4 +20,5 @@ public class CustomerAddressResponse : BaseResponse
     public string AddressLine { get; set; }
     public string ZipCode { get; set; }
     public bool IsDefault { get; set; }
+    public virtual CustomerResponse Customer { get; set; }
 }
