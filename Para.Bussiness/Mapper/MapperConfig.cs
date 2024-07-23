@@ -12,8 +12,7 @@ public class MapperConfig : Profile
         CreateMap<Customer, CustomerResponse>();
         CreateMap<CustomerRequest, Customer>().ForMember(dest => dest.CustomerNumber, opt => opt.Ignore());
         CreateMap<CustomerUpdateRequest, Customer>().ForMember(dest => dest.CustomerNumber, opt => opt.Ignore());
-        ;
-
+        
         CreateMap<CustomerAddress, CustomerAddressResponse>();
         CreateMap<CustomerAddressRequest, CustomerAddress>();
         

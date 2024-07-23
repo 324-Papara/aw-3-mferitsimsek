@@ -27,46 +27,7 @@ public class Startup
     
     public void ConfigureServices(IServiceCollection services)
     {
-               
-        services.AddControllers().AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            options.JsonSerializerOptions.WriteIndented = true;
-            options.JsonSerializerOptions.PropertyNamingPolicy = null;
-        });
-        services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Para.Api", Version = "v1" });
-        });
-
-        var connectionStringSql = Configuration.GetConnectionString("MsSqlConnection");
-        services.AddDbContext<ParaDbContext>(options => options.UseSqlServer(connectionStringSql));
-        //services.AddDbContext<ParaDbContext>(options => options.UseNpgsql(connectionStringPostgre));
-  
-
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        var config = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile(new MapperConfig());
-        });
-        services.AddSingleton(config.CreateMapper());
-
-
-        //services.AddMediatR(typeof(CreateCustomerCommand).GetTypeInfo().Assembly);
-
-        services.AddMediatR(typeof(CreateCustomerCommand).GetTypeInfo().Assembly);
-
-
-        services.AddTransient<CustomService1>();
-        services.AddScoped<CustomService2>();
-        services.AddSingleton<CustomService3>();
-
-        // Otomatik doðrulama yapmak için AutoValidation kullanýyoruz.
-        services.AddFluentValidationAutoValidation()
-                    .AddFluentValidationClientsideAdapters(); // doðrulama kurallarý sadece sunucu tarafýnda deðil istemci tarafýndada uygulanýr. Örn: JavaScript ile 
-
-        services.AddValidatorsFromAssemblyContaining<Startup>(); //Startup bulunduðu Assembly içindeki Validatörleri otomatik bulup DI ' a ekler..
+        services.AddApplicationServices(Configuration);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -85,6 +46,7 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseAuthorization();
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
