@@ -26,7 +26,7 @@ public class ErrorHandlerMiddleware
 
             context.Response.StatusCode = 500;
             context.Request.ContentType = "application/json";
-            await context.Response.WriteAsync(JsonSerializer.Serialize("Internal Server Error"));
+            await context.Response.WriteAsync(JsonSerializer.Serialize("Internal Server Error : "+ ex.Message));
         }
        
     }

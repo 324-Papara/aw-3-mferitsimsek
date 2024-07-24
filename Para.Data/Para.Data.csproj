@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Dapper" Version="2.1.35" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
@@ -20,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Para.Base\Para.Base.csproj" />
+      <ProjectReference Include="..\Para.Schema\Para.Schema.csproj" />
     </ItemGroup>
 
 </Project>

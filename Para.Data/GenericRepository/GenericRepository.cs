@@ -3,6 +3,11 @@ using Para.Base.Entity;
 using Para.Data.Helpers;
 using Para.Data.Context;
 using System.Linq.Expressions;
+using Para.Schema.DTOs;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using Humanizer.Configuration;
+using Dapper;
 
 namespace Para.Data.GenericRepository;
 
@@ -13,6 +18,7 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
     public GenericRepository(ParaDbContext dbContext)
     {
         this.dbContext = dbContext;
+
     }
 
     public async Task Save()
@@ -109,6 +115,14 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
 
         return await query.ToListAsync();
     }
-
-
+    //Dapper
+    public async Task<List<TResult>> GetCustomReportAsync<TResult>(string sqlQuery, object parameters = null)
+    {
+        using (var connection = new SqlConnection("Server=(localdb)\\MSSQLLocalDB; Database=padb;TrustServerCertificate=True;Integrated Security=true;"))
+        {
+            await connection.OpenAsync();
+            var result = await connection.QueryAsync<TResult>(sqlQuery, parameters);
+            return result.ToList();
+        }
+    }
 }

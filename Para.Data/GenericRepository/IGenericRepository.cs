@@ -1,3 +1,4 @@
+using Para.Schema.DTOs;
 using System.Linq.Expressions;
 
 namespace Para.Data.GenericRepository;
@@ -32,4 +33,8 @@ public interface IGenericRepository<TEntity> where TEntity : class
     // value = Karþýlaþtýrýlacak deðer "Ali" gibi
     // includeProperties = Include edilecek tablolar.
     Task<List<TEntity>> GetWithDynamicQuery(string propertyName, string comparison, string value, params Expression<Func<TEntity, object>>[] includeProperties);
+
+    //Dapper
+    Task<List<TResult>> GetCustomReportAsync<TResult>(string sqlQuery, object parameters = null);
+
 }

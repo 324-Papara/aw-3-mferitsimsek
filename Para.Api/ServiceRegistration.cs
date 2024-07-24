@@ -1,23 +1,25 @@
-﻿using AutoMapper;
-using FluentValidation.AspNetCore;
+﻿using Autofac;
+using AutoMapper;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Para.Api.Service;
-using Para.Data.Context;
-using Para.Data.UnitOfWork;
-using System.Text.Json.Serialization;
 using Para.Bussiness;
 using Para.Bussiness.CQRS.Commands.CustomerCommands;
+using Para.Data.Context;
+using Para.Data.UnitOfWork;
+using Serilog;
+using Serilog.Sinks.MSSqlServer;
 using System.Reflection;
-using Autofac;
+using System.Text.Json.Serialization;
 
 namespace Para.Api
 {
     public static class ServiceRegistration
     {
-        public static void AddApplicationServices(this IServiceCollection services, IConfiguration configuration, ContainerBuilder builder)
+        public static void AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             // JSON ayarları
             services.AddControllers().AddJsonOptions(options =>
@@ -40,34 +42,53 @@ namespace Para.Api
             // PostgreSQL bağlantısı eklemek istersek
             //services.AddDbContext<ParaDbContext>(options => options.UseNpgsql(connectionStringPostgre));
 
-            //services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
-
-            // AutoMapper ayarları
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile(new MapperConfig());
-            });
-            //services.AddSingleton(config.CreateMapper());
-            builder.RegisterInstance(config.CreateMapper()).As<IMapper>().SingleInstance();
-
-
-            //services.AddMediatR(typeof(CreateCustomerCommand).GetTypeInfo().Assembly);
-            builder.RegisterAssemblyTypes(typeof(CreateCustomerCommand).Assembly).AsImplementedInterfaces();
-
-
-            //services.AddTransient<CustomService1>();
-            builder.RegisterType<CustomService1>().InstancePerDependency();
-            //services.AddScoped<CustomService2>();
-            builder.RegisterType<CustomService2>().InstancePerLifetimeScope();
-            //services.AddSingleton<CustomService3>();
-            builder.RegisterType<CustomService3>().SingleInstance();
+            services.AddMediatR(typeof(CreateCustomerCommand).GetTypeInfo().Assembly);
 
             // Otomatik doğrulama yapmak için AutoValidation kullanıyoruz.
             services.AddFluentValidationAutoValidation()
                         .AddFluentValidationClientsideAdapters(); // doğrulama kuralları sadece sunucu tarafında değil istemci tarafındada uygulanır. Örn: JavaScript ile 
 
             services.AddValidatorsFromAssemblyContaining<Startup>(); //Startup bulunduğu Assembly içindeki Validatörleri otomatik bulup DI ' a ekler..
+        }
+        public static Serilog.ILogger ConfigureLogger(IConfiguration configuration)
+        {
+            var sinkOptions = new MSSqlServerSinkOptions
+            {
+                TableName = "Logs",
+                AutoCreateSqlTable = true
+            };
+
+            return new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .WriteTo.Console()
+                .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.MSSqlServer(
+                    connectionString: configuration.GetConnectionString("MsSqlConnection"),
+                    sinkOptions: sinkOptions)
+                .CreateLogger();
+        }
+        public static void ConfigureContainer(ContainerBuilder builder)
+        {
+            // UnitOfWork
+            builder.RegisterType<UnitOfWork>().As<IUnitOfWork>().InstancePerLifetimeScope();
+
+            //// AutoMapper
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MapperConfig());
+            });
+            builder.RegisterInstance(config.CreateMapper()).As<IMapper>().SingleInstance();
+
+            builder.RegisterAssemblyTypes(typeof(CreateCustomerCommand).Assembly)
+                    .AsImplementedInterfaces();
+
+            //// MediatR
+            builder.RegisterAssemblyTypes(typeof(CreateCustomerCommand).Assembly).AsImplementedInterfaces();
+
+            //// Custom services
+            builder.RegisterType<CustomService1>().InstancePerDependency();
+            builder.RegisterType<CustomService2>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomService3>().SingleInstance();
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Autofac;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -12,22 +13,25 @@ using Para.Bussiness;
 using Para.Bussiness.CQRS.Commands.CustomerCommands;
 using Para.Data.Context;
 using Para.Data.UnitOfWork;
+using Serilog;
 
 namespace Para.Api;
 
 public class Startup
 {
     public IConfiguration Configuration;
-    
+
     public Startup(IConfiguration configuration)
     {
         this.Configuration = configuration;
     }
-    
-    
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddApplicationServices(Configuration);
+        ServiceRegistration.AddApplicationServices(services,Configuration);
+    }
+    public void ConfigureContainer(ContainerBuilder builder)
+    {
+        ServiceRegistration.ConfigureContainer(builder);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -39,6 +43,7 @@ public class Startup
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Para.Api v1"));
         }
 
+        app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
         app.UseMiddleware<HeartbeatMiddleware>();
         app.UseMiddleware<ErrorHandlerMiddleware>();
