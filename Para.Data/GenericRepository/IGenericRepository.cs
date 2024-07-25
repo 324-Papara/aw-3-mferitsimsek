@@ -35,6 +35,7 @@ public interface IGenericRepository<TEntity> where TEntity : class
     Task<List<TEntity>> GetWithDynamicQuery(string propertyName, string comparison, string value, params Expression<Func<TEntity, object>>[] includeProperties);
 
     //Dapper
-    Task<List<TResult>> GetCustomReportAsync<TResult>(string sqlQuery, object parameters = null);
+    Task<List<CustomerReportDto>> GetCustomerReportAsync(string sqlQuery, object parameters = null);
+    Task<List<TResult>> GetReportAsync<TResult>(string sqlQuery, object parameters = null);
 
 }

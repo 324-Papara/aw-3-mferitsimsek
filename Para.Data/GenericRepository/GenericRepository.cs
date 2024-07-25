@@ -8,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Humanizer.Configuration;
 using Dapper;
+using Para.Data.Domain;
 
 namespace Para.Data.GenericRepository;
 
@@ -116,13 +117,51 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         return await query.ToListAsync();
     }
     //Dapper
-    public async Task<List<TResult>> GetCustomReportAsync<TResult>(string sqlQuery, object parameters = null)
+    public async Task<List<CustomerReportDto>> GetCustomerReportAsync(string sqlQuery, object parameters = null)
     {
-        using (var connection = new SqlConnection("Server=(localdb)\\MSSQLLocalDB; Database=padb;TrustServerCertificate=True;Integrated Security=true;"))
-        {
-            await connection.OpenAsync();
-            var result = await connection.QueryAsync<TResult>(sqlQuery, parameters);
-            return result.ToList();
-        }
+        using var connection = new SqlConnection("Server=(localdb)\\MSSQLLocalDB; Database=padb;TrustServerCertificate=True;Integrated Security=true;");
+        await connection.OpenAsync();
+
+        var customerDict = new Dictionary<long, CustomerReportDto>();
+
+        await connection.QueryAsync<CustomerReportDto, CustomerDetailDto, CustomerAddressDto, CustomerPhoneDto, CustomerReportDto>(
+            sqlQuery,
+            (customer, detail, address, phone) =>
+            {
+                if (!customerDict.TryGetValue(customer.Id, out var customerEntry))
+                {
+                    customerEntry = customer;
+                    customerEntry.CustomerDetail = detail;
+                    customerEntry.CustomerAddresses = new List<CustomerAddressDto>();
+                    customerEntry.CustomerPhones = new List<CustomerPhoneDto>();
+                    customerDict.Add(customer.Id, customerEntry);
+                }
+                // Address ve Telefon bilgisi liste halinde olacaðý için veri tekrarýný önlemek adýna eklendi.
+                if (address != null && !customerEntry.CustomerAddresses.Any(a => a.AddressLine == address.AddressLine && a.City == address.City))
+                {
+                    customerEntry.CustomerAddresses.Add(address);
+                }
+
+                if (phone != null && !customerEntry.CustomerPhones.Any(p => p.Phone == phone.Phone))
+                {
+                    customerEntry.CustomerPhones.Add(phone);
+                }
+
+                return customerEntry;
+            },
+            parameters
+        );
+
+        return customerDict.Values.ToList();
+
+    }
+
+    public async Task<List<TResult>> GetReportAsync<TResult>(string sqlQuery, object parameters = null)
+    {
+        using var connection = new SqlConnection("Server=(localdb)\\MSSQLLocalDB; Database=padb;TrustServerCertificate=True;Integrated Security=true;");
+        await connection.OpenAsync();
+
+        var result = await connection.QueryAsync<TResult>(sqlQuery, parameters);
+        return result.ToList();
     }
 }
